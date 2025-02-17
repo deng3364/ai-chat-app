@@ -18,6 +18,8 @@
   ],
   "env": {
     "PYTHONPATH": ".",
-    "FLASK_ENV": "production"
+    "FLASK_ENV": "production",
+    "ARK_API_KEY": "e9f71adf-9df3-442e-bfb0-0db7a141d20c",
+    "SERPAPI_API_KEY": "b31e64c8d871583a73ea5c60d7f02b634bac6f95c4217db520b106d98672b97f"
   }
 } 
