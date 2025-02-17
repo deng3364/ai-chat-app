@@ -4,17 +4,19 @@ from openai import OpenAI
 import time
 import requests
 import json
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 # API配置
-os.environ["ARK_API_KEY"] = "e9f71adf-9df3-442e-bfb0-0db7a141d20c"
-SERPAPI_API_KEY = "b31e64c8d871583a73ea5c60d7f02b634bac6f95c4217db520b106d98672b97f"  # 使用 SerpApi key
+ARK_API_KEY = os.environ.get("ARK_API_KEY", "e9f71adf-9df3-442e-bfb0-0db7a141d20c")
+SERPAPI_API_KEY = os.environ.get("SERPAPI_API_KEY", "b31e64c8d871583a73ea5c60d7f02b634bac6f95c4217db520b106d98672b97f")
 SERPAPI_URL = "https://serpapi.com/search.json"
 
 # 初始化OpenAI客户端
 client = OpenAI(
-    api_key = os.environ.get("ARK_API_KEY"),
+    api_key = ARK_API_KEY,
     base_url = "https://ark.cn-beijing.volces.com/api/v3",
     timeout=60.0
 )
@@ -166,4 +168,8 @@ def ask():
     )
 
 if __name__ == '__main__':
-    app.run(debug=True) 
+    # 本地运行时使用
+    app.run(debug=True)
+else:
+    # Vercel 部署时使用
+    app = app 
