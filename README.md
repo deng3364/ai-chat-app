@@ -1,78 +1,110 @@
 # AI 智能助手
 
-一个基于火山引擎和 SerpAPI 的智能对话系统，支持实时联网搜索和上下文对话。
+基于火山引擎的智能对话助手，支持实时联网搜索，提供流畅的对话体验。
 
 ## 功能特点
 
-- 🤖 基于火山引擎的智能对话
-- 🔍 支持实时联网搜索
-- 💬 支持上下文对话记忆
-- ⚡ 流式响应，实时显示
-- 🌐 跨平台支持
-- 🎨 简洁美观的用户界面
+- 🚀 基于火山引擎大语言模型
+- 🌐 支持实时联网搜索
+- 💬 流式对话响应
+- 📱 响应式界面设计
+- 🎨 类聊天软件的界面设计
+- ⌛ 优雅的加载动画
+- 🕒 消息时间戳显示
+- 📝 Markdown 格式支持
 
 ## 在线体验
 
-[在线演示地址]（部署后添加链接）
+访问：[https://ai-chat-app-xxx.vercel.app](https://ai-chat-app-xxx.vercel.app)
 
-## 本地运行
+## 本地开发
 
-1. 克隆项目
-bash
-git clone https://github.com/你的用户名/ai-chat-app.git
+### 环境要求
+
+- Python 3.8+
+- Flask 3.0.0
+- OpenAI 0.28.1
+- Python-dotenv 1.0.0
+- Flask-CORS 4.0.0
+- Requests 2.31.0
+
+### 安装步骤
+
+1. 克隆仓库
+```bash
+git clone https://github.com/deng3364/ai-chat-app.git
 cd ai-chat-app
+```
 
-2. 安装依赖
-bash
+2. 创建虚拟环境
+```bash
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# 或
+venv\Scripts\activate  # Windows
+```
+
+3. 安装依赖
+```bash
 pip install -r requirements.txt
+```
 
-3. 配置环境变量
-bash
-export SERPAPI_API_KEY="你的 SerpApi 密钥"
-export ARK_API_KEY="你的火山引擎 API 密钥"
-PORT=5000
+4. 配置环境变量
+```bash
+# 创建 .env 文件并添加以下配置
+ARK_API_KEY=your_api_key
+SERPAPI_API_KEY=your_api_key
+```
 
-4. 运行应用
-bash
+5. 运行应用
+```bash
 python app.py
+```
 
-访问 `http://localhost:5000` 即可使用。
+访问 http://localhost:5000 开始使用。
+
+## 项目结构
+
+```
+ai-chat-app/
+├── app.py              # Flask 应用主文件
+├── config.py           # 配置文件
+├── requirements.txt    # 项目依赖
+├── templates/         # HTML 模板
+│   └── index.html    # 主页面
+├── .gitignore        # Git 忽略文件
+├── LICENSE           # 开源协议
+├── README.md         # 项目说明
+└── vercel.json       # Vercel 配置
+```
 
 ## 技术栈
 
-- 后端：Flask
-- AI：火山引擎 API
-- 搜索：SerpAPI
-- 前端：HTML + CSS + JavaScript
+- 后端：Flask + Python
+- 前端：HTML + CSS + JavaScript + Tailwind CSS
 - 部署：Vercel
+- API：火山引擎 + SerpApi
 
-## 使用说明
+## 开源协议
 
-1. 直接对话：输入问题即可获得 AI 回答
-2. 联网搜索：开启搜索开关，AI 将结合最新网络信息回答
-3. 清除对话：点击清除按钮可重新开始对话
-
-## 注意事项
-
-- 需要配置相应的 API 密钥才能使用
-- 联网搜索功能需要 SerpAPI 支持
-- 建议在生产环境中使用 HTTPS
-
-## 开发计划
-
-- [ ] 添加更多搜索引擎支持
-- [ ] 优化对话历史管理
-- [ ] 添加用户认证功能
-- [ ] 支持更多对话模型
+本项目采用 MIT 协议开源，详见 [LICENSE](LICENSE) 文件。
 
 ## 贡献指南
 
-欢迎提交 Issues 和 Pull Requests 来帮助改进项目。
-
-## 许可证
-
-MIT License
+1. Fork 本仓库
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交改动 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 提交 Pull Request
 
 ## 联系方式
 
-如有问题或建议，欢迎联系：[你的邮箱或其他联系方式]
+作者：deng3364
+- GitHub：[@deng3364](https://github.com/deng3364)
+
+## 致谢
+
+- [火山引擎](https://www.volcengine.com/)
+- [SerpApi](https://serpapi.com/)
+- [Vercel](https://vercel.com/)
+- [Tailwind CSS](https://tailwindcss.com/)

@@ -11,6 +11,8 @@ CORS(app)
 # 配置 OpenAI
 openai.api_key = ARK_API_KEY
 openai.api_base = OPENAI_API_BASE
+openai.api_version = None
+openai.timeout = 30  # 设置超时时间为 30 秒
 
 class AIChat:
     @staticmethod
@@ -70,14 +72,15 @@ class AIChat:
         """创建聊天响应"""
         def generate():
             retry_count = 0
-            max_retries = 3
+            max_retries = 2  # 减少重试次数
             
             while retry_count < max_retries:
                 try:
                     response = openai.ChatCompletion.create(
                         model=OPENAI_MODEL,
                         messages=messages,
-                        stream=True
+                        stream=True,
+                        timeout=30  # 设置请求超时
                     )
                     
                     for chunk in response:
@@ -89,13 +92,11 @@ class AIChat:
                 except Exception as e:
                     retry_count += 1
                     if retry_count >= max_retries:
-                        error_msg = "连接失败，请稍后重试"
-                        if not SERPAPI_API_KEY:
-                            error_msg = "SerpApi未配置，但AI助手仍会尽力回答您的问题"
-                        yield f"data: Error: {error_msg} ({str(e)})\n\n"
+                        error_msg = "连接超时，请重试"
+                        yield f"data: Error: {error_msg}\n\n"
                         yield "event: done\ndata: \n\n"
                         return
-                    time.sleep(1)
+                    time.sleep(0.5)  # 减少重试等待时间
         
         return Response(
             generate(),

@@ -3,613 +3,425 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI智能搜索</title>
+    <title>AI 智能助手</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
+        .chat-container {
+            min-height: 400px;
+            height: auto;
+            overflow: visible;
+            transition: all 0.3s ease;
             background-color: #f5f5f5;
-        }
-        .container {
+            padding: 20px;
+            border-radius: 12px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 24px;
         }
-        .input-group {
+        .page-container {
+            padding: 2rem 1rem;
+            min-height: 100vh;
             display: flex;
-            gap: 10px;
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            flex-direction: column;
         }
-        input {
+        .main-content {
             flex: 1;
-            padding: 12px;
-            font-size: 16px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            outline: none;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            height: auto;
+            min-height: 600px;
         }
-        input:focus {
-            border-color: #4CAF50;
-            box-shadow: 0 0 0 2px rgba(76,175,80,0.2);
+        .message {
+            max-width: 85%;
+            margin: 16px 0;
+            display: flex;
+            align-items: flex-start;
+            animation: fadeIn 0.3s ease-in-out;
+            width: 100%;
         }
-        button {
-            padding: 12px 25px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.2s;
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            margin: 0 12px;
+            flex-shrink: 0;
+            background-color: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        button:hover {
-            background-color: #45a049;
-        }
-        button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
-        .response {
-            background: white;
-            border: 1px solid #e0e0e0;
-            padding: 30px;
-            border-radius: 10px;
+        .message-bubble {
+            padding: 12px 16px;
+            border-radius: 12px;
+            word-wrap: break-word;
             white-space: pre-wrap;
-            min-height: 100px;
-            line-height: 1.8;
-            font-size: 16px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            color: #2c3e50;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        }
-        .loading {
-            display: none;
-            color: #666;
-            text-align: center;
-            padding: 10px;
-            font-style: italic;
-        }
-        .cursor {
-            display: inline-block;
-            width: 2px;
-            height: 1.2em;
-            background: #000;
-            margin-left: 2px;
-            animation: blink 1s infinite;
-            vertical-align: middle;
-        }
-        @keyframes blink {
-            50% { opacity: 0; }
-        }
-        /* 段落样式 */
-        .response p {
-            margin: 1em 0;
-            line-height: 1.8;
-        }
-        /* 列表样式 */
-        .response ul, .response ol {
-            margin: 1em 0;
-            padding-left: 2em;
-        }
-        /* 强调文本 */
-        .response strong {
-            color: #1976D2;
-            font-weight: 600;
-        }
-        /* 链接样式 */
-        .response a {
-            color: #4CAF50;
-            text-decoration: none;
-        }
-        .response a:hover {
-            text-decoration: underline;
-        }
-        /* 代码块样式 */
-        .response pre {
-            background-color: #f8f9fa;
-            padding: 1.2em;
-            border-radius: 8px;
-            border: 1px solid #e9ecef;
-            font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
-            font-size: 0.95em;
-            overflow-x: auto;
-            margin: 1.2em 0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            max-width: calc(100% - 120px);
+            position: relative;
             line-height: 1.5;
         }
-        /* 列表项样式 */
-        .response li {
-            margin: 0.8em 0;
-            line-height: 1.8;
-            position: relative;
+        .user-message {
+            flex-direction: row-reverse;
+            margin-left: auto;
+            justify-content: flex-start;
         }
-        /* 特性标记样式 */
-        .response [data-feature] {
-            background-color: #f8f9fa;
-            padding: 1.2em;
-            border-radius: 8px;
-            margin: 1.8em 0;
-            border-left: 4px solid #4CAF50;
-            font-weight: bold;
-            color: #2c3e50;
-            font-size: 1.1em;
+        .user-message .message-bubble {
+            background-color: #95ec69;
+            margin-left: 12px;
+            border-top-right-radius: 4px;
+            margin-right: 0;
         }
-        /* 强调文本样式 */
-        .response em {
-            font-style: normal;
-            color: #2196F3;
-            font-weight: 500;
+        .assistant-message {
+            flex-direction: row;
+            margin-right: auto;
+            justify-content: flex-start;
         }
-        /* 特性编号样式 */
-        .response [data-number] {
-            display: inline-block;
-            background-color: #4CAF50;
-            color: white;
-            padding: 0.2em 0.6em;
-            border-radius: 4px;
-            margin-right: 0.5em;
-            font-size: 0.9em;
+        .assistant-message .message-bubble {
+            background-color: white;
+            margin-right: 12px;
+            border-top-left-radius: 4px;
+            margin-left: 0;
         }
-        .chat-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            height: 80vh;
-        }
-        
-        .chat-history {
-            flex: 1;
-            overflow-y: auto;
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        .message {
-            margin-bottom: 20px;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-        
-        .message-user {
-            text-align: right;
-        }
-        
-        .message-content {
-            display: inline-block;
-            padding: 12px 16px;
-            border-radius: 10px;
-            max-width: 80%;
-            margin: 4px 0;
-        }
-        
-        .message-user .message-content {
-            background-color: #4CAF50;
-            color: white;
-            border-radius: 10px 10px 0 10px;
-        }
-        
-        .message-assistant .message-content {
-            background-color: #f5f5f5;
-            color: #2c3e50;
-            border-radius: 10px 10px 10px 0;
-        }
-        
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
-        .chat-header {
+        .typing-indicator {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            gap: 4px;
+            margin: 8px 0;
         }
-        
-        .clear-button {
-            background-color: #f5f5f5;
+        .typing-indicator .message-bubble {
+            padding: 8px 12px;
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+        }
+        .typing-indicator .message-content {
+            display: flex;
+            align-items: center;
+            gap: 4px;
             color: #666;
-            padding: 8px 16px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .clear-button:hover {
-            background-color: #fee;
-            color: #d33;
-            border-color: #fcc;
-        }
-        
-        .clear-button:active {
-            transform: scale(0.98);
-        }
-        
-        .clear-icon {
-            font-size: 16px;
-        }
-        
-        /* 添加清除确认对话框样式 */
-        .confirm-dialog {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            z-index: 1000;
-            display: none;
-        }
-        
-        .confirm-dialog.show {
-            display: block;
-            animation: fadeIn 0.2s ease-out;
-        }
-        
-        .dialog-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            justify-content: flex-end;
-        }
-        
-        .dialog-buttons button {
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
             font-size: 14px;
         }
-        
-        .confirm-btn {
-            background-color: #dc3545;
-            color: white;
-            border: none;
+        .typing-indicator .message-content::after {
+            content: '';
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background-color: #999;
+            animation: typing 1s infinite;
         }
-        
-        .cancel-btn {
-            background-color: #f8f9fa;
-            color: #333;
-            border: 1px solid #ddd;
+        .toggle-switch {
+            width: 3.5rem;
+            height: 2rem;
+            position: relative;
+            display: inline-block;
         }
-        
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
+        .toggle-bg {
+            background-color: #ccc;
+            border-radius: 9999px;
+            height: 100%;
+            width: 100%;
+            transition: background-color 0.2s;
+        }
+        .toggle-slider {
+            background-color: white;
+            border-radius: 50%;
+            height: 1.5rem;
+            width: 1.5rem;
+            position: absolute;
+            top: 0.25rem;
+            left: 0.25rem;
+            transition: transform 0.2s;
+        }
+        input:checked + .toggle-bg {
+            background-color: #3b82f6;
+        }
+        input:checked + .toggle-bg .toggle-slider {
+            transform: translateX(1.5rem);
+        }
+        .header {
+            margin-bottom: 2rem;
+            padding: 1rem 0;
+        }
+        .controls {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+            background-color: white;
+            position: sticky;
             bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-            display: none;
+            z-index: 10;
         }
-        
-        .overlay.show {
-            display: block;
-        }
-
-        .message-system {
+        .message-time {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
             text-align: center;
-            margin: 10px 0;
+            position: absolute;
+            bottom: -20px;
+            width: 100%;
+            left: 0;
+        }
+        /* 消息气泡内容样式优化 */
+        .message-content {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.6;
+            font-size: 15px;
         }
 
-        .message-system .message-content {
-            background-color: #f8f9fa;
-            color: #666;
-            font-size: 14px;
-            padding: 8px 16px;
-            border-radius: 20px;
-            transition: all 0.3s ease;
+        /* AI 回复特定样式 */
+        .assistant-message .message-content {
+            color: #2c3e50;
         }
 
-        .message {
-            transition: all 0.3s ease;
+        /* 链接样式 */
+        .message-content a {
+            color: #2196F3;
+            text-decoration: none;
+            border-bottom: 1px solid #2196F3;
         }
 
-        .search-toggle {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 0 10px;
-            border-right: 1px solid #eee;
+        /* 引用样式 */
+        .message-content blockquote {
+            border-left: 4px solid #e3f2fd;
+            margin: 8px 0;
+            padding: 4px 12px;
+            color: #546e7a;
+            background: #f8f9fa;
         }
-        
-        .search-checkbox {
-            display: none;
+
+        /* 代码块样式 */
+        .message-content pre {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 8px 0;
         }
-        
-        .search-label {
-            cursor: pointer;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 14px;
-            color: #666;
-            background: #f5f5f5;
-            transition: all 0.2s ease;
-            user-select: none;
+
+        /* 列表样式 */
+        .message-content ul, 
+        .message-content ol {
+            margin: 8px 0;
+            padding-left: 24px;
         }
-        
-        .search-checkbox:checked + .search-label {
-            background: #4CAF50;
-            color: white;
+
+        /* 段落间距 */
+        .message-content p {
+            margin: 8px 0;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="chat-container">
-            <div class="chat-header">
-                <h1>AI智能搜索</h1>
-                <button onclick="clearHistory()" id="clearButton" class="clear-button">
-                    <span class="clear-icon">🗑️</span> 清除对话
-                </button>
-            </div>
-            <div id="chatHistory" class="chat-history"></div>
-            <div class="input-group">
-                <div class="search-toggle">
-                    <input type="checkbox" id="useSearch" class="search-checkbox">
-                    <label for="useSearch" class="search-label">🔍 联网搜索</label>
-                </div>
-                <input type="text" id="question" placeholder="请输入您的问题...">
-                <button onclick="askQuestion()" id="askButton">发送</button>
-            </div>
-        </div>
-        <div id="loading" class="loading">正在思考中...</div>
-    </div>
+<body class="bg-gray-50">
+    <div class="page-container">
+        <div class="container mx-auto max-w-4xl">
+            <!-- 头部 -->
+            <header class="header text-center">
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">AI 智能助手</h1>
+                <p class="text-gray-600">基于火山引擎，支持实时联网搜索</p>
+            </header>
 
-    <!-- 添加确认对话框 -->
-    <div class="overlay" id="overlay"></div>
-    <div class="confirm-dialog" id="confirmDialog">
-        <h3>确认清除对话</h3>
-        <p>是否确认清除所有对话历史？此操作不可撤销。</p>
-        <div class="dialog-buttons">
-            <button class="cancel-btn" onclick="hideConfirmDialog()">取消</button>
-            <button class="confirm-btn" onclick="confirmClear()">确认清除</button>
+            <!-- 主要内容区 -->
+            <div class="main-content bg-white rounded-lg shadow-lg p-6">
+                <!-- 聊天区域 -->
+                <div id="chat" class="chat-container bg-gray-50 rounded-lg p-4">
+                </div>
+
+                <!-- 控制区域 -->
+                <div class="controls space-y-4">
+                    <!-- 搜索开关 -->
+                    <div class="flex items-center justify-end space-x-3">
+                        <span class="text-sm text-gray-600">联网搜索</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="searchToggle" class="sr-only">
+                            <div class="toggle-bg">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- 输入区域 -->
+                    <div class="flex space-x-4">
+                        <input type="text" id="userInput" 
+                               class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               placeholder="输入你的问题...">
+                        <button onclick="clearChat()" 
+                                class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
+                            清除
+                        </button>
+                        <button onclick="sendMessage()" 
+                                class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                            发送
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // 添加对话历史数组
         let chatHistory = [];
-        
-        function addMessageToHistory(role, content) {
-            const chatHistoryDiv = document.getElementById('chatHistory');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message message-${role}`;
+        const chat = document.getElementById('chat');
+        const userInput = document.getElementById('userInput');
+        const searchToggle = document.getElementById('searchToggle');
+
+        userInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        function appendMessage(content, isUser = false) {
+            const div = document.createElement('div');
+            div.className = `message ${isUser ? 'user-message' : 'assistant-message'}`;
             
+            // 创建头像
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.innerHTML = isUser ? userAvatar : aiAvatar;  // 使用预定义的SVG
+            
+            // 创建消息气泡
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+            
+            // 创建消息内容容器
             const contentDiv = document.createElement('div');
             contentDiv.className = 'message-content';
-            contentDiv.textContent = role === 'user' ? content : formatText(content);
             
-            messageDiv.appendChild(contentDiv);
-            chatHistoryDiv.appendChild(messageDiv);
-            
-            // 滚动到底部
-            chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
-            
-            // 保存到历史记录
-            chatHistory.push(`${role}:${content}`);
-        }
-
-        function formatText(text) {
-            // 首先清理文本中的多余空格和换行
-            text = text.trim().replace(/\s+/g, ' ');
-            
-            // 处理主要特性段落
-            text = text.replace(/Python 是一种"(.*?)"，(.*?)。/, (match, desc, rest) => {
-                return `✨ Python 简介\n\nPython 是一种${desc}的编程语言。\n\n${rest}。`;
-            });
-            
-            // 处理特性编号和标题
-            text = text.replace(/--###\s*"(\d+)\.\s*(.*?)"/g, (match, num, title) => {
-                return `\n\n🔸 特性 ${num}：${title}\n`;
-            });
-            
-            // 处理子特性
-            text = text.replace(/"(\*\*.*?\*\*)"/g, (match, content) => {
-                content = content.replace(/\*\*/g, '');
-                return `\n  • ${content}`;
-            });
-            
-            // 处理代码示例
-            text = text.replace(/```(.*?)```/g, (match, code) => {
-                return '\n📝 代码示例：\n    ' + code.replace(/\n/g, '\n    ').trim() + '\n';
-            });
-            
-            // 处理子项说明
-            text = text.replace(/:\s*"([^"]+)"/g, '：\n    $1');
-            
-            // 处理破折号列表
-            text = text.replace(/\s*-\s*"([^"]+)"/g, '\n  • $1');
-            
-            // 格式化列表项
-            let lines = text.split('\n');
-            
-            lines = lines.map(line => {
-                line = line.trim();
-                
-                // 特性标题增加上下间距
-                if (line.startsWith('🔸')) {
-                    return '\n' + line + '\n';
-                }
-                
-                // 列表项缩进
-                if (line.startsWith('•')) {
-                    return '    ' + line;
-                }
-                
-                // 代码示例保持缩进
-                if (line.startsWith('📝')) {
-                    return '\n' + line;
-                }
-                
-                return line;
-            });
-            
-            text = lines.join('\n');
-            
-            // 替换一些特殊词语的表达
-            text = text
-                .replace(/Web开发/g, '🌐 Web开发')
-                .replace(/数据科学/g, '📊 数据科学')
-                .replace(/机器学习/g, '🤖 机器学习')
-                .replace(/人工智能/g, '🧠 人工智能')
-                .replace(/自动化/g, '⚙️ 自动化')
-                .replace(/GUI/g, '🖥️ GUI')
-                .replace(/GitHub/g, '📦 GitHub')
-                .replace(/Windows/g, '🪟 Windows')
-                .replace(/Linux/g, '🐧 Linux')
-                .replace(/macOS/g, '🍎 macOS');
-            
-            // 清理格式
-            text = text
-                .replace(/\n{3,}/g, '\n\n')     // 清理多余空行
-                .replace(/\s+$/gm, '')           // 清理行尾空格
-                .replace(/。\s*/g, '。\n')        // 在句号后添加换行
-                .replace(/：\s*/g, '：\n')        // 在冒号后添加换行
-                .trim();
-            
-            // 添加段落间距
-            text = text.split('\n').map(line => {
-                if (line.startsWith('🔸')) {
-                    return '\n' + line;  // 特性标题前添加空行
-                }
-                return line;
-            }).join('\n');
-            
-            // 添加结尾总结
-            if (text.includes('总结')) {
-                text = text.replace(/总结/g, '\n💡 总结');
+            // 处理消息内容
+            if (!isUser) {
+                // 为 AI 回复添加 Markdown 样式格式化
+                contentDiv.innerHTML = formatMessage(content);
+            } else {
+                contentDiv.textContent = content;
             }
             
-            return text;
+            bubble.appendChild(contentDiv);
+            
+            // 添加时间
+            const time = document.createElement('div');
+            time.className = 'message-time';
+            time.textContent = new Date().toLocaleTimeString('zh-CN', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            bubble.appendChild(time);
+            
+            // 组装消息
+            div.appendChild(avatar);
+            div.appendChild(bubble);
+            
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
+            return contentDiv;
         }
 
-        async function askQuestion() {
-            const question = document.getElementById('question').value;
-            if (!question) return;
-            
-            // 添加用户问题到界面
-            addMessageToHistory('user', question);
-            
-            const loading = document.getElementById('loading');
-            const askButton = document.getElementById('askButton');
-            const questionInput = document.getElementById('question');
-            
-            askButton.disabled = true;
-            loading.style.display = 'block';
-            questionInput.value = '';
-            
+        function clearChat() {
+            chat.innerHTML = '';
+            chatHistory = [];
+        }
+
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            // 添加用户消息
+            appendMessage(message, true);
+            userInput.value = '';
+
+            // 添加等待指示器
+            const waitingDiv = document.createElement('div');
+            waitingDiv.className = 'message assistant-message typing-indicator';
+            waitingDiv.innerHTML = `
+                <div class="avatar">
+                    ${aiAvatar}
+                </div>
+                <div class="message-bubble">
+                    <div class="message-content">正在思考中</div>
+                </div>
+            `;
+            chat.appendChild(waitingDiv);
+
             try {
-                const useSearch = document.getElementById('useSearch').checked;
+                // 构建历史记录
                 const historyParam = chatHistory.join('|');
                 
-                const eventSource = new EventSource(`/ask?${new URLSearchParams({
-                    question: question,
-                    history: historyParam,
-                    search: useSearch
-                })}`);
-                
+                // 发送请求
+                const response = await fetch(`/ask?question=${encodeURIComponent(message)}&history=${encodeURIComponent(historyParam)}&search=${searchToggle.checked}`);
+                const reader = response.body.getReader();
                 let assistantResponse = '';
-                
-                eventSource.onmessage = function(event) {
-                    assistantResponse += event.data;
-                };
-                
-                eventSource.onerror = function(error) {
-                    eventSource.close();
-                    if (!assistantResponse) {
-                        addMessageToHistory('assistant', '连接失败，请稍后重试');
+
+                // 移除等待指示器
+                waitingDiv.remove();
+
+                // 创建助手回复
+                const assistantDiv = appendMessage('');
+
+                // 处理流式响应
+                while (true) {
+                    const {value, done} = await reader.read();
+                    if (done) break;
+
+                    const text = new TextDecoder().decode(value);
+                    const lines = text.split('\n');
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const content = line.slice(6);
+                            if (content.trim() && !content.includes('Error:')) {
+                                assistantResponse += content;
+                                assistantDiv.innerHTML = formatMessage(assistantResponse);
+                            }
+                        }
                     }
-                    askButton.disabled = false;
-                    loading.style.display = 'none';
-                };
-                
-                eventSource.addEventListener('done', function(event) {
-                    eventSource.close();
-                    if (assistantResponse) {
-                        addMessageToHistory('assistant', assistantResponse);
-                    }
-                    askButton.disabled = false;
-                    loading.style.display = 'none';
-                });
-                
+                }
+
+                // 更新历史记录
+                chatHistory.push(`user:${message}`);
+                chatHistory.push(`assistant:${assistantResponse}`);
+
             } catch (error) {
-                addMessageToHistory('assistant', '发生错误：' + error.message);
-                askButton.disabled = false;
-                loading.style.display = 'none';
+                // 移除等待指示器
+                waitingDiv.remove();
+                appendMessage('抱歉，发生错误，请稍后重试。');
+                console.error('Error:', error);
             }
         }
 
-        // 添加回车键监听
-        document.getElementById('question').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && !document.getElementById('askButton').disabled) {
-                askQuestion();
-            }
-        });
+        // 添加消息格式化函数
+        function formatMessage(text) {
+            if (!text) return '';
+            
+            // 简单的 Markdown 样式处理
+            return text
+                // 处理链接 [文本](url)
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+                // 处理引用
+                .replace(/^>(.+)$/gm, '<blockquote>$1</blockquote>')
+                // 处理代码块
+                .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+                // 处理列表
+                .replace(/^\s*[-*]\s+(.+)$/gm, '<li>$1</li>')
+                .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
+                // 处理段落
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/^(.+)$/gm, '<p>$1</p>');
+        }
 
-        function showConfirmDialog() {
-            document.getElementById('overlay').classList.add('show');
-            document.getElementById('confirmDialog').classList.add('show');
-        }
-        
-        function hideConfirmDialog() {
-            document.getElementById('overlay').classList.remove('show');
-            document.getElementById('confirmDialog').classList.remove('show');
-        }
-        
-        function clearHistory() {
-            showConfirmDialog();
-        }
-        
-        function confirmClear() {
-            // 清除对话历史
-            chatHistory = [];
-            const chatHistoryDiv = document.getElementById('chatHistory');
-            chatHistoryDiv.innerHTML = '';
-            
-            // 添加清除提示
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message message-system';
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'message-content system-message';
-            contentDiv.textContent = '对话历史已清除';
-            messageDiv.appendChild(contentDiv);
-            chatHistoryDiv.appendChild(messageDiv);
-            
-            // 3秒后自动移除提示消息
-            setTimeout(() => {
-                messageDiv.style.opacity = '0';
-                messageDiv.style.transform = 'translateY(-10px)';
-                setTimeout(() => {
-                    messageDiv.remove();
-                }, 300);
-            }, 2000);
-            
-            // 隐藏确认对话框
-            hideConfirmDialog();
-        }
-        
-        // 添加点击遮罩层关闭对话框
-        document.getElementById('overlay').addEventListener('click', hideConfirmDialog);
-        
-        // 添加 ESC 键关闭对话框
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                hideConfirmDialog();
-            }
-        });
+        // 预定义头像 SVG
+        const userAvatar = `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="40" height="40" rx="4" fill="#E8F5E9"/>
+            <path d="M20 12C17.24 12 15 14.24 15 17C15 19.76 17.24 22 20 22C22.76 22 25 19.76 25 17C25 14.24 22.76 12 20 12ZM20 20C18.34 20 17 18.66 17 17C17 15.34 18.34 14 20 14C21.66 14 23 15.34 23 17C23 18.66 21.66 20 20 20ZM20 23C16.67 23 14 25.67 14 29V30H26V29C26 25.67 23.33 23 20 23ZM16 28C16 26.34 17.34 25 19 25H21C22.66 25 24 26.34 24 28H16Z" fill="#4CAF50"/>
+        </svg>`;
+        const aiAvatar = `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="40" height="40" rx="4" fill="#E3F2FD"/>
+            <path d="M20 12C16.13 12 13 15.13 13 19C13 21.38 14.19 23.47 16 24.74V28C16 28.55 16.45 29 17 29H23C23.55 29 24 28.55 24 28V24.74C25.81 23.47 27 21.38 27 19C27 15.13 23.87 12 20 12ZM22 27H18V25H22V27ZM22.85 23.11L22 23.62V23H18V23.62L17.15 23.11C15.87 22.34 15 20.77 15 19C15 16.24 17.24 14 20 14C22.76 14 25 16.24 25 19C25 20.77 24.13 22.34 22.85 23.11Z" fill="#2196F3"/>
+        </svg>`;
     </script>
 </body>
 </html> 
